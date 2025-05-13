@@ -29,14 +29,16 @@ public class KafkaMessageProducer implements CommandLineRunner {
         for (int i = 1; i <= 3; i++) {
             int threadId = i;
             executor.submit(() -> {
-                for (int j = 1; j <= 5; j++) {
-                    String message = "message" + threadId + "-" + j;
+                int counter = 1;
+                while (true) {
+                    String message = "message" + threadId + "-" + counter++;
                     kafkaTemplate.send("demo-topic", message);
                     System.out.printf("Producer %d sent: %s%n", threadId, message);
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(5000);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
+                        break;
                     }
                 }
             });

@@ -10,7 +10,30 @@ import java.util.concurrent.Executors;
 @Component
 public class KafkaTestConsumer {
 
-    private final ExecutorService executorService = Executors.newFixedThreadPool(3);
+    @KafkaListener(
+            topics = "demo-topic",
+            containerFactory = "kafkaListenerContainerFactory"
+    )
+    public void listen(String message, Acknowledgment ack) {
+        String threadName = Thread.currentThread().getName();
+        System.out.println("Получено: " + message + " | Поток: " + threadName);
+
+        try {
+            if (message.contains("3")) {
+                Thread.sleep(10_000);
+            } else {
+                Thread.sleep(1_000);
+            }
+
+            ack.acknowledge();
+            System.out.println("Коммит выполнен: " + message + " | Поток: " + threadName);
+
+        } catch (Exception e) {
+            System.err.println("Ошибка при обработке: " + message + " | " + e.getMessage());
+        }
+    }
+
+/*    private final ExecutorService executorService = Executors.newFixedThreadPool(3);
 
     @KafkaListener(
             topics = "demo-topic",
@@ -23,9 +46,9 @@ public class KafkaTestConsumer {
         executorService.submit(() -> {
             try {
                 if (message.contains("3")) {
-                    Thread.sleep(10000);
+                    Thread.sleep(10_000);
                 } else {
-                    Thread.sleep(1000);
+                    Thread.sleep(1_000);
                 }
 
                 ack.acknowledge();
@@ -35,7 +58,7 @@ public class KafkaTestConsumer {
                 System.err.println("Ошибка при обработке: " + message + " | " + e.getMessage());
             }
         });
-    }
+    }*/
 
     //без ExecutorService уходит в бесконечную перебалансировку консьюмеров
 
@@ -46,9 +69,9 @@ public class KafkaTestConsumer {
 
         try {
             if (message.contains("3")) {
-                Thread.sleep(10000);
+                Thread.sleep(10_000);
             } else {
-                Thread.sleep(1000);
+                Thread.sleep(1_000);
                 System.out.println("Коммит выполнен: " + message + " | Поток: " + threadName);
             }
             ack.acknowledge();

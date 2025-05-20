@@ -17,36 +17,11 @@ import java.util.concurrent.Executors;
 public class KafkaMessageProducer implements CommandLineRunner {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-
-    public KafkaMessageProducer(KafkaTemplate<String, String> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
-
-    // переделал на однопоточный продюсер
-    @Override
-    public void run(String... args) {
-        Executors.newFixedThreadPool(3).submit(() -> {
-            int i = 0;
-            while (true) {
-                String message = "message3-" + i++;
-                kafkaTemplate.send("demo-topic", message);
-                System.out.println("Producer sent: " + message);
-                try {
-                    Thread.sleep(5_000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
-    }
-
-    /*private final KafkaTemplate<String, String> kafkaTemplate;
     private final ExecutorService executor = Executors.newFixedThreadPool(3);
 
     public KafkaMessageProducer(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
-
 
     @Override
     public void run(String... args) {
@@ -67,5 +42,5 @@ public class KafkaMessageProducer implements CommandLineRunner {
                 }
             });
         }
-    }*/
+    }
 }
